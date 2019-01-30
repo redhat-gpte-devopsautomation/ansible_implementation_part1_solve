@@ -1,0 +1,6 @@
+---
+- name: Play to create devops user setup
+  hosts: all,localhost
+  roles:
+    - devops_user
+

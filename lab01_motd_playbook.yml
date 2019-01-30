@@ -1,0 +1,7 @@
+- name: Solve Lab if asked
+  hosts: all
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Managed by Ansible added to motd
+      shell: "echo Managed by Ansible > /etc/motd"

@@ -1,0 +1,37 @@
+---
+- name: Play for static inventory
+  hosts: localhost
+  tasks:
+  - name: Inserting a line after a pattern in Ansible example 
+    blockinfile:
+      path: /home/devops/ansible_implementation/hosts
+      marker: ""
+      block: |
+        [lb]
+        frontend1.{{GUID}}.internal
+        [webservers]
+        app1.{{GUID}}.internal
+        app2.{{GUID}}.internal
+        [db]
+        appdb1.{{GUID}}.internal
+        [webservers:vars]
+        ansible_user = devops
+        ansible_ssh_private_key_file = /home/devops/.ssh/id_rsa
+
+- name: Play to configure/Install apache
+  hosts: apps
+  become: yes
+  tasks:
+  - name: Install httpd package
+    yum:
+      name: httpd
+      state: latest
+  - name: Enable and start httpd service
+    service:
+       name: httpd
+       state: started
+       enabled: yes
+  - name: Create index.html file for hosting static content
+    copy:
+      content: "Hoorraaayyy!!! My first playbook ran successfully"
+      dest: /var/www/html/index.html

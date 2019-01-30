@@ -1,0 +1,53 @@
+- name: Create devops user
+  user:
+    name: "{{ user_name }}"
+    password: "{{ user_password | password_hash('sha512') }}" 
+    generate_ssh_key: True
+    state: present
+
+- name: get devops user's public key
+  shell: cat /home/devops/.ssh/id_rsa.pub
+  register: ssh_pubkey
+  when: inventory_hostname == 'localhost'
+
+- name: Copy ssh public key on all servers
+  authorized_key: 
+    user: "{{ user_name }}" 
+    key: "{{ hostvars['localhost']['ssh_pubkey']['stdout'] }}"
+  when: (copy_ssh_pubkey ) and ( inventory_hostname != 'localhost' )
+
+- name: Sudoer user setup
+  lineinfile:
+    dest: /etc/sudoers 
+    state: present 
+    line: '{{ user_name }} ALL=(ALL) NOPASSWD: ALL'
+  when: user_is_sudoer
+
+- name: Create Project directory for logs
+  file:
+    path: "{{ devops_project_dir }}"
+    state: directory
+    owner: "{{ user_name  }}"
+    group: "{{ user_name  }}"
+    mode: 0775
+  when: inventory_hostname == 'localhost'
+
+- name: Copy hosts and ansible.cfg
+  template:
+    src: "{{ item }}"
+    dest: "{{ devops_project_dir }}"
+    owner: "{{ user_name  }}"
+    group: "{{ user_name  }}"
+    mode: 0644
+  loop:
+    - ansible.cfg
+    - hosts
+
+- name: Create library 
+  file:
+    path: "{{ devops_project_dir }}/library"
+    state: directory
+    owner: "{{ user_name  }}"
+    group: "{{ user_name  }}"
+    mode: 0775
+  when: inventory_hostname == 'localhost'
