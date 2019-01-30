@@ -3,7 +3,7 @@
   roles:
    - app-tier
 
-- hosts: appdb
+- hosts: appdbs
   become: yes
   roles:
    - db-tier
