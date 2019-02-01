@@ -1,7 +1,7 @@
 
 <?php
 
-	$db=mysqli_connect("app1.{{GUID}}.internal", {{ db['user'] | to_json }} ,{{ db['password'] | to_json }}, {{ db['database'] | to_json }});
+	$db=mysqli_connect("appdb1.{{GUID}}.internal", {{ db['user'] | to_json }} ,{{ db['password'] | to_json }}, {{ db['database'] | to_json }});
 
 	if (mysqli_connect_errno()){
 		echo "Failed to connect";
